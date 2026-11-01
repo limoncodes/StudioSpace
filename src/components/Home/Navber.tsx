@@ -67,6 +67,16 @@ const Navber = () => {
             L
           </button>
 
+          {/* sign in  */}
+          <Link href="/registration" className="hidden rounded-lg bg-[#9CF237] px-4 py-2 text-sm font-semibold text-[#1E1E1E] hover:bg-[#8ad92d] lg:block">
+            Registration
+          </Link>
+
+          {/* Log in */}
+          <Link href="/log-in" className="hidden rounded-lg bg-[#9CF237] px-4 py-2 text-sm font-semibold text-[#1E1E1E] hover:bg-[#8ad92d] lg:block">
+            Log In
+          </Link>
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}

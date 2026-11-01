@@ -127,3 +127,14 @@
     @apply font-sans;
     }
 }
+
+
+/* StudioSpace Premium Typography */
+
+.font-body {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-heading {
+  font-family: var(--font-playfair), Georgia, serif;
+}
