@@ -60,8 +60,11 @@ const AddStudio = () => {
         );
     };
 
+
+
+
     // Form Submit
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setFormMessage(null);
@@ -173,8 +176,19 @@ const AddStudio = () => {
             },
         };
 
-        // Console Output
-        console.log("StudioSpace - New Studio Data:", studioData);
+        
+
+        // ==========================================
+        const res = await fetch("http://localhost:5000/add-studio", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            body: JSON.stringify(studioData),
+        })
+        const data = await res.json();
+        console.log("Server Response:", data);
 
         // alart
         toast.success('Studio form submitted successfully!', {
@@ -261,7 +275,7 @@ const AddStudio = () => {
                             {/* 01. Studio Information */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                    
+
 
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Studio Details
@@ -345,7 +359,7 @@ const AddStudio = () => {
                             {/* 02. Pricing & Capacity */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                    
+
 
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Set Your Pricing
@@ -430,7 +444,7 @@ const AddStudio = () => {
                             {/* 03. Studio Image */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                    
+
 
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Studio Image
@@ -463,7 +477,7 @@ const AddStudio = () => {
                             {/* 04. Amenities */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                    
+
 
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Amenities & Facilities
@@ -508,7 +522,7 @@ const AddStudio = () => {
                             {/* 05. Overview */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                   
+
 
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Studio Overview
@@ -537,7 +551,7 @@ const AddStudio = () => {
                             {/* 06. Owner Information */}
                             <div>
                                 <div className="mb-6 border-b border-[#E5E7EB] pb-4">
-                                    
+
                                     <h2 className="mt-2 font-heading text-2xl font-bold text-[#1E1E1E]">
                                         Studio Owner
                                     </h2>
