@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Input } from "@/components/ui/input";
@@ -10,12 +11,15 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
 
 const Register = () => {
+  const router = useRouter();
+
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formMessage, setFormMessage] = useState<{
     type: "success" | "error";
@@ -42,6 +46,8 @@ const Register = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     setFormMessage(null);
     setPasswordError("");
 
@@ -50,11 +56,14 @@ const Register = () => {
 
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim();
+
+    // Profile image is optional
     const photoURL = String(formData.get("photoURL") || "").trim();
+
     const enteredPassword = String(formData.get("password") || "");
 
-    // Required Fields
-    if (!name || !email || !photoURL || !enteredPassword) {
+    // Required Fields (Image is not required)
+    if (!name || !email || !enteredPassword) {
       setFormMessage({
         type: "error",
         text: "Please fill in all the required fields.",
@@ -73,19 +82,21 @@ const Register = () => {
       return;
     }
 
-    // Photo URL Validation
-    try {
-      const url = new URL(photoURL);
+    // Optional Image URL Validation
+    if (photoURL) {
+      try {
+        const url = new URL(photoURL);
 
-      if (url.protocol !== "http:" && url.protocol !== "https:") {
-        throw new Error("Invalid URL");
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          throw new Error("Invalid URL");
+        }
+      } catch {
+        setFormMessage({
+          type: "error",
+          text: "Please enter a valid image URL.",
+        });
+        return;
       }
-    } catch {
-      setFormMessage({
-        type: "error",
-        text: "Please enter a valid photo URL.",
-      });
-      return;
     }
 
     // Password Validation
@@ -114,42 +125,63 @@ const Register = () => {
       return;
     }
 
-    // Registration Data
-    const userData = {
-      name,
-      email,
-      photoURL,
-      password: enteredPassword,
-    };
-    /* ===================================== Submit ============================================================ */
-    // Console Output (Frontend Demo Only)
-    console.log("StudioSpace Registration Data:", userData);
-
     try {
-      await authClient.signUp.email({
-        ...userData
-      })
+      setIsSubmitting(true);
+
+      // Better Auth Registration
+      const { data, error } = await authClient.signUp.email({
+        name,
+        email,
+        password: enteredPassword,
+        ...(photoURL ? { image: photoURL } : {}),
+        callbackURL: "/",
+      });
+
+      // Handle Registration Error
+      if (error) {
+        setFormMessage({
+          type: "error",
+          text: error.message || "Registration failed. Please try again.",
+        });
+        return;
+      }
+
+      // Never log the user's password
+      console.log("StudioSpace Registration:", {
+        name,
+        email,
+        image: photoURL || "No profile image provided",
+      });
+
+      // Reset Form
+      form.reset();
+      setPassword("");
+      setPasswordError("");
+
+      // Redirect after successful signup with session
+      if (data?.token) {
+        router.replace("/");
+        router.refresh();
+        return;
+      }
+
+      // Email verification may be required
+      setFormMessage({
+        type: "success",
+        text: "Account created successfully! Please check your email if verification is required.",
+      });
 
     } catch (error) {
+      console.error("Registration Error:", error);
 
       setFormMessage({
         type: "error",
         text: "An error occurred during registration. Please try again.",
       });
-      return;
 
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setFormMessage({
-      type: "success",
-      text: "Form submitted successfully! ",
-    });
-    redirect('/')
-
-    // Reset Form
-    form.reset();
-    setPassword("");
-    setPasswordError("");
   };
 
   // Social Login Demo
@@ -234,10 +266,11 @@ const Register = () => {
               <div
                 role={formMessage.type === "error" ? "alert" : "status"}
                 aria-live="polite"
-                className={`mb-6 rounded-xl border p-3 text-sm ${formMessage.type === "success"
+                className={`mb-6 rounded-xl border p-3 text-sm ${
+                  formMessage.type === "success"
                     ? "border-[#DDF4C2] bg-[#F4FAEB] text-[#477D16]"
                     : "border-red-200 bg-red-50 text-red-700"
-                  }`}
+                }`}
               >
                 {formMessage.text}
               </div>
@@ -286,13 +319,16 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Photo URL */}
+              {/* Optional Photo URL */}
               <div className="space-y-2">
                 <label
                   htmlFor="photoURL"
                   className="text-sm font-semibold text-[#1E1E1E]"
                 >
-                  Profile Photo URL <span className="text-[#7DBE20]">*</span>
+                  Profile Photo URL{" "}
+                  <span className="font-normal text-[#9CA3AF]">
+                    (Optional)
+                  </span>
                 </label>
 
                 <Input
@@ -304,7 +340,7 @@ const Register = () => {
                 />
 
                 <p className="text-xs text-[#9CA3AF]">
-                  Add a publicly accessible image URL for your profile.
+                  Add a profile image URL or leave this field empty.
                 </p>
               </div>
 
@@ -341,8 +377,11 @@ const Register = () => {
                   {passwordChecks.map((check) => (
                     <div
                       key={check.label}
-                      className={`flex items-center gap-2 text-xs ${check.valid ? "text-[#477D16]" : "text-[#6B7280]"
-                        }`}
+                      className={`flex items-center gap-2 text-xs ${
+                        check.valid
+                          ? "text-[#477D16]"
+                          : "text-[#6B7280]"
+                      }`}
                     >
                       <span className="flex h-4 w-4 items-center justify-center rounded-full border border-current text-[10px]">
                         {check.valid ? "✓" : "•"}
@@ -363,10 +402,17 @@ const Register = () => {
               {/* Register Button */}
               <Button
                 type="submit"
-                className="h-12 w-full rounded-xl bg-[#9CF237] text-sm font-bold text-[#1E1E1E] shadow-none transition-colors hover:bg-[#8DE62B]"
+                disabled={isSubmitting}
+                className="h-12 w-full rounded-xl bg-[#9CF237] text-sm font-bold text-[#1E1E1E] shadow-none transition-colors hover:bg-[#8DE62B] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Create Account
-                <span className="ml-2 text-lg">→</span>
+                {isSubmitting ? (
+                  "Creating Account..."
+                ) : (
+                  <>
+                    Create Account
+                    <span className="ml-2 text-lg">→</span>
+                  </>
+                )}
               </Button>
             </form>
 
@@ -419,8 +465,8 @@ const Register = () => {
 
             {/* Demo Notice */}
             <p className="mt-5 text-center text-[11px] leading-5 text-[#9CA3AF]">
-              Demo registration form. Your information is logged locally
-              in the browser console. No account is created.
+              Your registration details are securely submitted to StudioSpace.
+              Your password is never printed in the browser console.
             </p>
 
           </CardContent>

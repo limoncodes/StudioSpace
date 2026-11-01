@@ -38,9 +38,9 @@ const LogIN = () => {
 
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
-    const data = { email, password };
+    
     // ================================== console log for debugging ==========================================
-    console.log("Login Form Data:", data);
+    
 
     if (!email || !password) {
       setFormMessage({

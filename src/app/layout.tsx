@@ -6,6 +6,7 @@ import "./globals.css";
 
 import Navber from "@/components/Home/Navber";
 import Footer from "@/components/Footer";
+import { Bounce, ToastContainer } from "react-toastify";
 
 // Premium Heading Font
 const playfair = Playfair_Display({
@@ -38,6 +39,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col font-body">
         <Navber />
+        <ToastContainer
+          position="top-left"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
 
         <main className="flex-1">{children}</main>
 
