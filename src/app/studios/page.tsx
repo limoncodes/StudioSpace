@@ -15,6 +15,9 @@ interface Studio {
 }
 
 const Studio = async () => {
+
+
+
   let studios: Studio[] = [];
 
   try {
