@@ -36,7 +36,7 @@ const menuLinks = [
   },
   {
     name: "My Studio Listings",
-    href: "/my-studios",
+    href: "/my-listing",
   },
   {
     name: "My Bookings",

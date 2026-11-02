@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Bounce, toast } from "react-toastify";
+import { redirect } from "next/navigation";
 
 const categories = [
     "Photo Studio",
@@ -208,6 +209,7 @@ const AddStudio = () => {
             type: "success",
             text: "Studio form submitted successfully! ",
         });
+        redirect("/my-listing")
     };
 
     return (
