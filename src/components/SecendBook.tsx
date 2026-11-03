@@ -19,6 +19,7 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { redirect } from "next/navigation"
 
 interface StudioDetailsProps {
     studioDetails: {
@@ -209,6 +210,7 @@ const SecendBook = ({ studioDetails }: StudioDetailsProps) => {
 
         setOpen(false)
         resetForm()
+        redirect("/studios")
         
     }
 

@@ -13,6 +13,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
 import { authClient } from "@/lib/auth-client";
+import { createAuthClient } from "better-auth/react";
 
 const Register = () => {
   const router = useRouter();
@@ -184,15 +185,17 @@ const Register = () => {
     }
   };
 
-  // Social Login Demo
-  const handleSocialLogin = (provider: "Google" | "GitHub") => {
-    console.log(`${provider} login button clicked`);
-
-    setFormMessage({
-      type: "error",
-      text: `${provider} authentication is not connected yet.`,
+  // Social Login 
+  const handleGoogleLogin = async () => {
+    const authClient = createAuthClient()
+    const data = await authClient.signIn.social({
+      provider: "google",
     });
+    console.log(data)
+
+
   };
+  
 
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-[#F4F5F6] px-4 py-10 font-body sm:px-6 lg:py-16">
@@ -266,11 +269,10 @@ const Register = () => {
               <div
                 role={formMessage.type === "error" ? "alert" : "status"}
                 aria-live="polite"
-                className={`mb-6 rounded-xl border p-3 text-sm ${
-                  formMessage.type === "success"
+                className={`mb-6 rounded-xl border p-3 text-sm ${formMessage.type === "success"
                     ? "border-[#DDF4C2] bg-[#F4FAEB] text-[#477D16]"
                     : "border-red-200 bg-red-50 text-red-700"
-                }`}
+                  }`}
               >
                 {formMessage.text}
               </div>
@@ -377,11 +379,10 @@ const Register = () => {
                   {passwordChecks.map((check) => (
                     <div
                       key={check.label}
-                      className={`flex items-center gap-2 text-xs ${
-                        check.valid
+                      className={`flex items-center gap-2 text-xs ${check.valid
                           ? "text-[#477D16]"
                           : "text-[#6B7280]"
-                      }`}
+                        }`}
                     >
                       <span className="flex h-4 w-4 items-center justify-center rounded-full border border-current text-[10px]">
                         {check.valid ? "✓" : "•"}
@@ -430,26 +431,18 @@ const Register = () => {
             </div>
 
             {/* Social Login */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 ">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleSocialLogin("Google")}
+                onClick={handleGoogleLogin}
                 className="h-12 rounded-xl border-[#E5E7EB] bg-white text-sm font-semibold text-[#1E1E1E] hover:bg-[#F4F5F6]"
               >
                 <FcGoogle size={20} />
                 Google
               </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleSocialLogin("GitHub")}
-                className="h-12 rounded-xl border-[#E5E7EB] bg-white text-sm font-semibold text-[#1E1E1E] hover:bg-[#F4F5F6]"
-              >
-                <FaGithub size={20} />
-                GitHub
-              </Button>
+              
             </div>
 
             {/* Login Link */}

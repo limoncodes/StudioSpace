@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { FaGithub } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
+import { createAuthClient } from "better-auth/react";
 
 const LogIN = () => {
   const router = useRouter();
@@ -94,39 +95,15 @@ const LogIN = () => {
   };
 
   // Google & GitHub Social Login
-  const handleSocialLogin = async (
-    provider: "google" | "github"
-  ) => {
-    setFormMessage(null);
-
-    try {
-      setSocialLoading(provider);
-
-      const { error } = await authClient.signIn.social({
-        provider,
-        callbackURL: "/",
-      });
-
-      if (error) {
-        setFormMessage({
-          type: "error",
-          text:
-            error.message ||
-            `${provider} login failed. Please try again.`,
-        });
-      }
-
-    } catch (error) {
-      console.error(`${provider} Login Error:`, error);
-
-      setFormMessage({
-        type: "error",
-        text: `Unable to connect with ${provider}. Please try again.`,
-      });
-    } finally {
-      setSocialLoading(null);
-    }
-  };
+ const handleGoogleLogin = async () => {
+   const authClient = createAuthClient()
+    const data = await authClient.signIn.social({
+     provider: "google",
+   });
+   console.log(data)
+   
+  
+ };
 
   return (
     <section className="min-h-[calc(100vh-5rem)] bg-[#F4F5F6] px-4 py-10 font-body sm:px-6 lg:py-16">
@@ -295,14 +272,14 @@ const LogIN = () => {
             </div>
 
             {/* Social Login Buttons */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
 
               {/* Google Login */}
               <Button
                 type="button"
                 variant="outline"
                 disabled={loading || socialLoading !== null}
-                onClick={() => handleSocialLogin("google")}
+                onClick={handleGoogleLogin}
                 className="h-12 rounded-xl border-[#E5E7EB] bg-white text-sm font-semibold text-[#1E1E1E] transition-colors hover:bg-[#F4F5F6] disabled:opacity-60"
               >
                 {socialLoading === "google" ? (
@@ -316,22 +293,7 @@ const LogIN = () => {
               </Button>
 
               {/* GitHub Login */}
-              <Button
-                type="button"
-                variant="outline"
-                disabled={loading || socialLoading !== null}
-                onClick={() => handleSocialLogin("github")}
-                className="h-12 rounded-xl border-[#E5E7EB] bg-white text-sm font-semibold text-[#1E1E1E] transition-colors hover:bg-[#F4F5F6] disabled:opacity-60"
-              >
-                {socialLoading === "github" ? (
-                  "Connecting..."
-                ) : (
-                  <>
-                    <FaGithub size={20} />
-                    Continue with GitHub
-                  </>
-                )}
-              </Button>
+             
 
             </div>
 

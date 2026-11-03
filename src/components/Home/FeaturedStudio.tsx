@@ -1,4 +1,5 @@
 
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,7 +13,74 @@ interface Studio {
   rating?: number | null;
 }
 
-const FeaturedStudio = async () => {
+// Loading Skeleton
+const FeaturedStudioSkeleton = () => {
+  return (
+    <section className="bg-white px-5 py-16 font-body sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div>
+            <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[2.5px] text-[#7DBE20]">
+              <span className="h-2 w-2 rounded-full bg-[#9CF237]" />
+              HANDPICKED CREATIVE SPACES
+            </p>
+
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-[#1E1E1E] sm:text-4xl lg:text-5xl">
+              Featured Studios
+            </h2>
+
+            <p className="mt-4 max-w-xl text-sm leading-7 text-[#6B7280] sm:text-base">
+              Explore inspiring creative workspaces and discover the perfect
+              place to bring your next big idea to life.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 sm:justify-end">
+            <div className="h-4 w-28 animate-pulse rounded bg-[#F4F5F6]" />
+
+            <Link
+              href="/studios"
+              className="group inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 text-xs font-bold text-[#1E1E1E] transition-all hover:border-[#9CF237] hover:bg-[#F8FCEF]"
+            >
+              View All Studios
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <article
+              key={item}
+              className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white"
+            >
+              <div className="aspect-[4/3] animate-pulse bg-[#F4F5F6]" />
+
+              <div className="space-y-4 p-5">
+                <div className="h-5 w-3/4 animate-pulse rounded bg-[#F4F5F6]" />
+
+                <div className="h-4 w-1/2 animate-pulse rounded bg-[#F4F5F6]" />
+
+                <div className="h-4 w-1/3 animate-pulse rounded bg-[#F4F5F6]" />
+
+                <div className="flex items-center justify-between gap-3 border-t border-[#E5E7EB] pt-5">
+                  <div className="h-8 w-24 animate-pulse rounded bg-[#F4F5F6]" />
+
+                  <div className="h-10 w-28 animate-pulse rounded-xl bg-[#F4F5F6]" />
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Main Featured Studios Data Component
+const FeaturedStudioContent = async () => {
   let studios: Studio[] = [];
 
   try {
@@ -226,6 +294,15 @@ const FeaturedStudio = async () => {
 
       </div>
     </section>
+  );
+};
+
+// Suspense Wrapper
+const FeaturedStudio = () => {
+  return (
+    <Suspense fallback={<FeaturedStudioSkeleton />}>
+      <FeaturedStudioContent />
+    </Suspense>
   );
 };
 
