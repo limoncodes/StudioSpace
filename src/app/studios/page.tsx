@@ -14,9 +14,15 @@ interface Studio {
   rating?: number | null;
 }
 
-const Studio = async () => {
+interface StudioPageProps {
+  searchParams: Promise<{
+    category?: string;
+  }>;
+}
 
-
+const Studio = async ({ searchParams }: StudioPageProps) => {
+  const params = await searchParams;
+  const selectedCategory = params.category || "";
 
   let studios: Studio[] = [];
 
@@ -49,6 +55,24 @@ const Studio = async () => {
     );
   }
 
+  // Dynamic Categories From MongoDB
+  const categories = [
+    ...new Set(
+      studios
+        .map((studio) => studio.category?.trim())
+        .filter((category): category is string => Boolean(category))
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+
+  // Functional Category Filter
+  const filteredStudios = selectedCategory
+    ? studios.filter(
+        (studio) =>
+          studio.category?.trim().toLowerCase() ===
+          selectedCategory.trim().toLowerCase()
+      )
+    : studios;
+
   return (
     <section className="min-h-screen bg-white px-5 py-14 font-body sm:px-8 lg:px-10 lg:py-20">
       <div className="mx-auto max-w-7xl">
@@ -73,17 +97,66 @@ const Studio = async () => {
 
             <p className="text-sm text-[#6B7280]">
               <span className="font-bold text-[#1E1E1E]">
-                {studios.length}
+                {filteredStudios.length}
               </span>{" "}
               Creative Spaces
             </p>
           </div>
         </div>
 
+        {/* Category Filter */}
+        <div className="mb-8 flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-[#F4F5F6]/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          
+          <div>
+            <h2 className="text-sm font-bold text-[#1E1E1E]">
+              Filter by Category
+            </h2>
+            <p className="mt-1 text-xs text-[#6B7280]">
+              Choose a creative space category to explore.
+            </p>
+          </div>
+
+          <form
+            action="/studios"
+            method="GET"
+            className="flex flex-col gap-2 sm:flex-row"
+          >
+            <select
+              name="category"
+              defaultValue={selectedCategory}
+              className="h-11 w-full min-w-0 rounded-xl border border-[#E5E7EB] bg-white px-4 text-sm text-[#1E1E1E] outline-none transition focus:border-[#9CF237] focus:ring-2 focus:ring-[#9CF237]/20 sm:min-w-[210px]"
+            >
+              <option value="">All Categories</option>
+
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="submit"
+              className="h-11 rounded-xl bg-[#9CF237] px-5 text-sm font-bold text-[#1E1E1E] transition-colors hover:bg-[#8DE62B]"
+            >
+              Apply Filter
+            </button>
+
+            {selectedCategory && (
+              <Link
+                href="/studios"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-[#E5E7EB] bg-white px-4 text-sm font-semibold text-[#6B7280] transition-colors hover:border-[#9CF237] hover:text-[#1E1E1E]"
+              >
+                Clear
+              </Link>
+            )}
+          </form>
+        </div>
+
         {/* Studio Grid */}
-        {studios.length > 0 ? (
+        {filteredStudios.length > 0 ? (
           <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {studios.map((studio) => (
+            {filteredStudios.map((studio) => (
               <article
                 key={studio._id}
                 className="group overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#D3ECA9] hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)]"
@@ -160,7 +233,7 @@ const Studio = async () => {
                         </span>
                       </p>
                     </div>
-{/* ==================================  View details ============================================================== */}
+
                     <Link
                       href={`/studios/${studio._id}`}
                       className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#9CF237] px-4 text-xs font-bold text-[#1E1E1E] transition-colors hover:bg-[#8DE62B]"
@@ -175,12 +248,25 @@ const Studio = async () => {
         ) : (
           <div className="rounded-2xl border border-[#E5E7EB] bg-[#F4F5F6]/50 px-5 py-20 text-center">
             <h2 className="font-heading text-2xl font-bold text-[#1E1E1E]">
-              No Studios Available Yet
+              {studios.length > 0
+                ? "No Studios Found"
+                : "No Studios Available Yet"}
             </h2>
 
             <p className="mt-3 text-sm text-[#6B7280]">
-              New creative spaces will appear here soon.
+              {studios.length > 0
+                ? "No studios are available in this category. Try another category."
+                : "New creative spaces will appear here soon."}
             </p>
+
+            {selectedCategory && (
+              <Link
+                href="/studios"
+                className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#9CF237] px-5 text-xs font-bold text-[#1E1E1E] hover:bg-[#8DE62B]"
+              >
+                View All Studios
+              </Link>
+            )}
           </div>
         )}
       </div>

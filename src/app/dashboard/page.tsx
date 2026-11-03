@@ -1151,19 +1151,9 @@ const Dashboard = () => {
                     )}
                 </section>
 
-                {/* =====================================
-                    FOOTER
-                ===================================== */}
+              
 
-                <footer className="mt-9 flex flex-col items-center justify-between gap-2 text-center sm:flex-row">
-                    <p className="text-xs text-[#9CA3AF]">
-                        © 2026 StudioSpace. All rights reserved.
-                    </p>
-
-                    <p className="text-xs text-[#9CA3AF]">
-                        Made for creative minds.
-                    </p>
-                </footer>
+                
             </div>
         </main>
     )
