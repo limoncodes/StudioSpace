@@ -1,135 +1,246 @@
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* =========================================
+   TAILWIND THEME
+========================================= */
+
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: var(--font-sans);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+  /* Typography */
+  --font-sans: var(--font-dm-sans);
+  --font-heading: var(--font-playfair);
+
+  /* shadcn Colors */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* Border Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+/* =========================================
+   STUDIOSPACE LIGHT THEME
+========================================= */
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+  color-scheme: light;
+
+  /* Brand Colors */
+  --ss-background: #FFFFFF;
+  --ss-surface: #F4F5F6;
+  --ss-card: #FFFFFF;
+  --ss-foreground: #1E1E1E;
+  --ss-muted: #6B7280;
+  --ss-border: #E5E7EB;
+  --ss-soft-green: #F0F9E6;
+
+  --ss-accent: #9CF237;
+  --ss-accent-hover: #8DE62B;
+
+  /* shadcn Theme */
+  --background: #FFFFFF;
+  --foreground: #1E1E1E;
+
+  --card: #FFFFFF;
+  --card-foreground: #1E1E1E;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1E1E;
+
+  --primary: #9CF237;
+  --primary-foreground: #1E1E1E;
+
+  --secondary: #F4F5F6;
+  --secondary-foreground: #1E1E1E;
+
+  --muted: #F4F5F6;
+  --muted-foreground: #6B7280;
+
+  --accent: #F0F9E6;
+  --accent-foreground: #1E1E1E;
+
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #9CF237;
+
+  /* Charts */
+  --chart-1: #9CF237;
+  --chart-2: #779C47;
+  --chart-3: #526C37;
+  --chart-4: #B7D88C;
+  --chart-5: #35402F;
+
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1E1E1E;
+  --sidebar-primary: #9CF237;
+  --sidebar-primary-foreground: #1E1E1E;
+  --sidebar-accent: #F4F5F6;
+  --sidebar-accent-foreground: #1E1E1E;
+  --sidebar-border: #E5E7EB;
+  --sidebar-ring: #9CF237;
 }
 
+/* =========================================
+   STUDIOSPACE PREMIUM DARK THEME
+========================================= */
+
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+
+  /* Brand Dark Palette */
+  --ss-background: #10140F;
+  --ss-surface: #171D16;
+  --ss-card: #1D241C;
+  --ss-foreground: #F2F5ED;
+  --ss-muted: #B5BFAF;
+  --ss-border: #35402F;
+  --ss-soft-green: #29351F;
+
+  --ss-accent: #9CF237;
+  --ss-accent-hover: #B2F46B;
+
+  /* shadcn Theme */
+  --background: #10140F;
+  --foreground: #F2F5ED;
+
+  --card: #1D241C;
+  --card-foreground: #F2F5ED;
+
+  --popover: #1D241C;
+  --popover-foreground: #F2F5ED;
+
+  --primary: #9CF237;
+  --primary-foreground: #1E1E1E;
+
+  --secondary: #242D22;
+  --secondary-foreground: #F2F5ED;
+
+  --muted: #20291E;
+  --muted-foreground: #B5BFAF;
+
+  --accent: #29351F;
+  --accent-foreground: #F2F5ED;
+
+  --destructive: oklch(0.704 0.191 22.216);
+
+  --border: #35402F;
+  --input: #35402F;
+  --ring: #9CF237;
+
+  /* Charts */
+  --chart-1: #9CF237;
+  --chart-2: #B2D987;
+  --chart-3: #779C47;
+  --chart-4: #526C37;
+  --chart-5: #35402F;
+
+  /* Sidebar */
+  --sidebar: #171D16;
+  --sidebar-foreground: #F2F5ED;
+  --sidebar-primary: #9CF237;
+  --sidebar-primary-foreground: #1E1E1E;
+  --sidebar-accent: #29351F;
+  --sidebar-accent-foreground: #F2F5ED;
+  --sidebar-border: #35402F;
+  --sidebar-ring: #9CF237;
 }
+
+/* =========================================
+   BASE STYLES
+========================================= */
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
+  }
+
   html {
     @apply font-sans;
-    }
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100%;
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: #9CF237;
+    color: #1E1E1E;
+  }
 }
 
-
-/* StudioSpace Premium Typography */
+/* =========================================
+   STUDIOSPACE TYPOGRAPHY
+========================================= */
 
 .font-body {
   font-family: var(--font-dm-sans), sans-serif;
@@ -137,4 +248,144 @@
 
 .font-heading {
   font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* =========================================
+   GLOBAL DARK MODE SURFACES
+========================================= */
+
+/* White backgrounds */
+html.dark [class~="bg-white"],
+html.dark [class~="bg-white/90"],
+html.dark [class~="bg-white/95"] {
+  background-color: var(--ss-card) !important;
+}
+
+/* Light grey backgrounds */
+html.dark [class~="bg-[#F4F5F6]"],
+html.dark [class~="bg-[#F4F5F6]/50"],
+html.dark [class~="bg-[#F8F9F7]"],
+html.dark [class~="bg-[#FAFBF9]"],
+html.dark [class~="bg-[#FAFAFA]"],
+html.dark [class~="bg-[#F8FAF5]"],
+html.dark [class~="bg-[#F8FAF7]"],
+html.dark [class~="bg-[#F8FCEF]"],
+html.dark [class~="bg-[#F8F9F8]"],
+html.dark [class~="bg-[#FAFCF7]"] {
+  background-color: var(--ss-surface) !important;
+}
+
+/* Soft green backgrounds */
+html.dark [class~="bg-[#F0F9E6]"],
+html.dark [class~="bg-[#F5FBEF]"],
+html.dark [class~="bg-[#EFF8E5]"],
+html.dark [class~="bg-[#F4FAEB]"],
+html.dark [class~="bg-[#EAF7D9]"],
+html.dark [class~="bg-[#FAFDF5]"] {
+  background-color: var(--ss-soft-green) !important;
+}
+
+/* Charcoal backgrounds */
+html.dark [class~="bg-[#1E1E1E]"] {
+  background-color: #242D22 !important;
+}
+
+/* =========================================
+   GLOBAL DARK MODE TEXT
+========================================= */
+
+/* Primary Text */
+html.dark [class~="text-[#1E1E1E]"] {
+  color: var(--ss-foreground) !important;
+}
+
+/* Muted Text */
+html.dark [class~="text-[#6B7280]"],
+html.dark [class~="text-[#858585]"],
+html.dark [class~="text-[#929292]"],
+html.dark [class~="text-[#9CA3AF]"],
+html.dark [class~="text-[#4B5563]"] {
+  color: var(--ss-muted) !important;
+}
+
+/* Lime / Green Text */
+html.dark [class~="text-[#739F36]"],
+html.dark [class~="text-[#7DBE20]"],
+html.dark [class~="text-[#527D21]"],
+html.dark [class~="text-[#477D16]"],
+html.dark [class~="text-[#648F27]"],
+html.dark [class~="text-[#668B35]"],
+html.dark [class~="text-[#7A9E4B]"] {
+  color: #B8E68A !important;
+}
+
+/* Keep dark text readable on Neon Lime buttons */
+html.dark [class~="bg-[#9CF237]"][class~="text-[#1E1E1E]"],
+html.dark [class~="bg-[#9CF237]"] [class~="text-[#1E1E1E]"] {
+  color: #1E1E1E !important;
+}
+
+/* =========================================
+   GLOBAL DARK MODE BORDERS
+========================================= */
+
+html.dark [class~="border-[#E5E7EB]"],
+html.dark [class~="border-[#D9DEE5]"],
+html.dark [class~="border-[#D1D5DB]"],
+html.dark [class~="border-[#E5EBDD]"],
+html.dark [class~="border-[#DCE6D2]"] {
+  border-color: var(--ss-border) !important;
+}
+
+/* =========================================
+   INPUTS & FORM ELEMENTS
+========================================= */
+
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+  background-color: var(--ss-card);
+  color: var(--ss-foreground);
+  border-color: var(--ss-border);
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #879184;
+}
+
+html.dark select option {
+  background-color: var(--ss-card);
+  color: var(--ss-foreground);
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: var(--ss-accent);
+}
+
+/* =========================================
+   DARK MODE HOVER STATES
+========================================= */
+
+html.dark [class~="hover:bg-[#F4F5F6]"]:hover,
+html.dark [class~="hover:bg-[#F8FCEF]"]:hover {
+  background-color: var(--ss-elevated, #242D22) !important;
+}
+
+html.dark [class~="hover:border-[#9CF237]"]:hover,
+html.dark [class~="hover:border-[#CBEA9E]"]:hover {
+  border-color: var(--ss-accent) !important;
+}
+
+/* =========================================
+   SMOOTH THEME TRANSITION
+========================================= */
+
+html,
+body {
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
 }

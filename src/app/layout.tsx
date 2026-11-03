@@ -1,3 +1,4 @@
+
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
@@ -7,6 +8,7 @@ import "./globals.css";
 import Navber from "@/components/Home/Navber";
 import Footer from "@/components/Footer";
 import { Bounce, ToastContainer } from "react-toastify";
+import ThemeProvider from "@/components/ThemeProvider";
 
 // Premium Heading Font
 const playfair = Playfair_Display({
@@ -30,34 +32,47 @@ export const metadata: Metadata = {
     "Discover and book inspiring creative studios for photography, podcasting, music, and more.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-theme="light"
+      suppressHydrationWarning
       className={`${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body">
-        <Suspense fallback={<div className="h-20" />}>
-          <Navber />
-        </Suspense>
-        <ToastContainer
-          position="top-left"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          transition={Bounce}
-        />
+      <body className="flex min-h-full flex-col font-body">
 
-        <main className="flex-1">{children}</main>
+        <ThemeProvider>
+          {/* Navbar */}
+          <Suspense fallback={<div className="h-20" />}>
+            <Navber />
+          </Suspense>
 
-        <Footer />
+          {/* Toast Notifications */}
+          <ToastContainer
+            position="top-left"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+
+          {/* Main Content */}
+          <main className="flex-1">
+            {children}
+          </main>
+
+          {/* Footer */}
+          <Footer />
+
+        </ThemeProvider>
       </body>
     </html>
   );
