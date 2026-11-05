@@ -30,14 +30,9 @@ export default function Loading() {
           STUDIOSPACE
         </p>
 
-        {/* Loading Title */}
-        <h2 className="mt-3 font-heading text-2xl font-bold text-[#1E1E1E] sm:text-3xl">
-          Preparing Your Creative Space
-        </h2>
+       
 
-        <p className="mt-3 text-sm text-[#6B7280]">
-          Creating a seamless creative experience...
-        </p>
+        
 
         {/* Animated Loading Bar */}
         <div className="mt-8 h-1 w-36 overflow-hidden rounded-full bg-[#F4F5F6]">
