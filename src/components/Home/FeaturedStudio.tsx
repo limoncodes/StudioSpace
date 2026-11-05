@@ -84,7 +84,7 @@ const FeaturedStudioContent = async () => {
   let studios: Studio[] = [];
 
   try {
-    const res = await fetch("http://localhost:5000/studiolimit", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/studiolimit`, {
       cache: "no-store",
     });
 
