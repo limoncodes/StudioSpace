@@ -183,7 +183,7 @@ const MyBooking = () => {
             setError("")
 
             const res = await fetch(
-                `http://localhost:5000/booking/${encodeURIComponent(user.email)}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/booking/${encodeURIComponent(user.email)}`,
                 {
                     cache: "no-store",
                     signal: controller.signal,

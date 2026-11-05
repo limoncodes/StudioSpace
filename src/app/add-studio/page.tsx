@@ -189,7 +189,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         }
 
         // Send Studio Data
-        const res = await fetch("http://localhost:5000/add-studio", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

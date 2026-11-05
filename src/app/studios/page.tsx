@@ -27,7 +27,7 @@ const Studio = async ({ searchParams }: StudioPageProps) => {
   let studios: Studio[] = [];
 
   try {
-    const res = await fetch("http://localhost:5000/add-studio", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio`, {
       cache: "no-store",
     });
 

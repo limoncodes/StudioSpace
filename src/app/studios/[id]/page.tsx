@@ -1,5 +1,5 @@
 
-import Booking from "@/components/Booking";
+
 import FirstBookinCard from "@/components/FirstBookinCard";
 import Image from "next/image";
 import Link from "next/link";
@@ -43,7 +43,7 @@ const StudioDetails = async ({
   let studioDetails: Studio;
 
   try {
-    const res = await fetch(`http://localhost:5000/add-studio/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/add-studio/${id}`, {
       cache: "no-store",
       
     });

@@ -28,7 +28,7 @@ const CancelBooking = ({
             setLoading(true)
 
             const res = await fetch(
-                `http://localhost:5000/bookingdelet/${bookingId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/bookingdelet/${bookingId}`,
                 {
                     method: "DELETE",
                 }

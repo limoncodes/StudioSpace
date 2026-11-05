@@ -229,7 +229,7 @@ const Dashboard = () => {
                 }
 
                 const res = await fetch(
-                    `http://localhost:5000/bookingowner/${encodeURIComponent(
+                    `${process.env.NEXT_PUBLIC_API_URL}/bookingowner/${encodeURIComponent(
                         userEmail
                     )}`,
                     {
@@ -305,16 +305,16 @@ const Dashboard = () => {
         if (isPending) return;
 
         if (!user?.email) {
-            setBookings([]);
-            setLoading(false);
             return;
         }
 
         const controller = new AbortController();
-
-        void fetchBookings(controller.signal);
+        const timeoutId = window.setTimeout(() => {
+            void fetchBookings(controller.signal);
+        }, 0);
 
         return () => {
+            window.clearTimeout(timeoutId);
             controller.abort();
         };
     }, [isPending, user?.email, fetchBookings]);
@@ -344,7 +344,7 @@ const Dashboard = () => {
             }
 
             const res = await fetch(
-                `http://localhost:5000/UpdateBooking/${encodeURIComponent(
+                `${process.env.NEXT_PUBLIC_API_URL}/UpdateBooking/${encodeURIComponent(
                     user.email
                 )}`,
                 {
