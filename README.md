@@ -6,7 +6,7 @@ StudioSpace is a premium peer-to-peer creative studio booking marketplace design
 
 ## 🌐 Live Website
 
-**Client Live URL:** [Add Your Deployed Client URL Here]
+**Client Live URL:** https://studio-space-azure.vercel.app
 
 ## ✨ Key Features
 
