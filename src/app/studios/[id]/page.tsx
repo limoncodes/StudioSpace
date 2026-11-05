@@ -38,12 +38,14 @@ const StudioDetails = async ({
   params: Promise<{ id: string }>;
 }) => {
   const { id } = await params;
+  
 
   let studioDetails: Studio;
 
   try {
     const res = await fetch(`http://localhost:5000/add-studio/${id}`, {
       cache: "no-store",
+      
     });
 
     if (res.status === 404) {

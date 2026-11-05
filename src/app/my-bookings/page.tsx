@@ -16,6 +16,8 @@ import {
 } from "react-icons/fi"
 
 import CancelBooking from "@/components/CancelBooking"
+import { auth } from "@/lib/auth"
+import { getTokenFormClient } from "@/lib/getTokenFormClient"
 
 // Booking Status
 type BookingStatus =
@@ -114,17 +116,17 @@ const BookingProgress = ({
                             <div className="flex min-w-0 flex-col items-center text-center">
 
                                 <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 ${completed
-                                        ? "border-[#9CF237] bg-[#9CF237] text-[#1E1E1E]"
-                                        : active
-                                            ? "border-[#9CF237] bg-white text-[#1E1E1E] shadow-[0_0_0_4px_rgba(156,242,55,0.15)]"
-                                            : "border-[#E5E7EB] bg-white text-[#9CA3AF]"
+                                    ? "border-[#9CF237] bg-[#9CF237] text-[#1E1E1E]"
+                                    : active
+                                        ? "border-[#9CF237] bg-white text-[#1E1E1E] shadow-[0_0_0_4px_rgba(156,242,55,0.15)]"
+                                        : "border-[#E5E7EB] bg-white text-[#9CA3AF]"
                                     }`}>
                                     {completed ? <FiCheck /> : index + 1}
                                 </div>
 
                                 <p className={`mt-2 text-[10px] font-semibold sm:text-xs ${completed || active
-                                        ? "text-[#1E1E1E]"
-                                        : "text-[#9CA3AF]"
+                                    ? "text-[#1E1E1E]"
+                                    : "text-[#9CA3AF]"
                                     }`}>
                                     {step}
                                 </p>
@@ -138,8 +140,8 @@ const BookingProgress = ({
 
                             {index !== 2 && (
                                 <div className={`mx-2 mt-[17px] h-[2px] flex-1 ${index < currentIndex
-                                        ? "bg-[#9CF237]"
-                                        : "bg-[#E5E7EB]"
+                                    ? "bg-[#9CF237]"
+                                    : "bg-[#E5E7EB]"
                                     }`} />
                             )}
 
@@ -174,7 +176,9 @@ const MyBooking = () => {
 
         const controller = new AbortController()
 
+
         const fetchBookings = async () => {
+            const token = await getTokenFormClient()
             setLoading(true)
             setError("")
 
@@ -183,6 +187,9 @@ const MyBooking = () => {
                 {
                     cache: "no-store",
                     signal: controller.signal,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
                 }
             )
 

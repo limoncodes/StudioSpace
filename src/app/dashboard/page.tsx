@@ -1,43 +1,44 @@
 
-"use client"
+"use client";
 
-import Image from "next/image"
-import { authClient } from "@/lib/auth-client"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getTokenFormClient } from "@/lib/getTokenFormClient";
 
 type BookingStatus =
     | "Pending"
     | "Confirmed"
     | "Completed"
-    | "Cancelled"
+    | "Cancelled";
 
 type Booking = {
-    _id: string
-    customerName: string
-    customerEmail: string
-    customerImage: string
-    studioTitle: string
-    studioCategory: string
-    studioLocation: string
-    studioImage: string
-    ownerName: string
-    ownerEmail: string
-    ownerImage: string
-    bookingDate: string
-    startTime: string
-    durationHours: number
-    guests: number
-    hourlyRate: number
-    subtotal: number
-    securityDeposit: number
-    totalAmount: number
-    specialRequest: string
-    status: BookingStatus
-    createdAt: string
-    updatedAt: string
-}
+    _id: string;
+    customerName: string;
+    customerEmail: string;
+    customerImage: string;
+    studioTitle: string;
+    studioCategory: string;
+    studioLocation: string;
+    studioImage: string;
+    ownerName: string;
+    ownerEmail: string;
+    ownerImage: string;
+    bookingDate: string;
+    startTime: string;
+    durationHours: number;
+    guests: number;
+    hourlyRate: number;
+    subtotal: number;
+    securityDeposit: number;
+    totalAmount: number;
+    specialRequest: string;
+    status: BookingStatus;
+    createdAt: string;
+    updatedAt: string;
+};
 
-type Filter = "All" | BookingStatus
+type Filter = "All" | BookingStatus;
 
 const filters: Filter[] = [
     "All",
@@ -45,16 +46,16 @@ const filters: Filter[] = [
     "Confirmed",
     "Completed",
     "Cancelled",
-]
+];
 
 const statusConfig: Record<
     BookingStatus,
     {
-        label: string
-        symbol: string
-        dot: string
-        badge: string
-        text: string
+        label: string;
+        symbol: string;
+        dot: string;
+        badge: string;
+        text: string;
     }
 > = {
     Pending: {
@@ -85,7 +86,7 @@ const statusConfig: Record<
         badge: "border-red-200 bg-red-50",
         text: "text-red-700",
     },
-}
+};
 
 // Normalize Booking Status
 const normalizeStatus = (status: unknown): BookingStatus => {
@@ -93,19 +94,19 @@ const normalizeStatus = (status: unknown): BookingStatus => {
         typeof status === "string"
             ? status.charAt(0).toUpperCase() +
               status.slice(1).toLowerCase()
-            : "Pending"
+            : "Pending";
 
     return value in statusConfig
         ? (value as BookingStatus)
-        : "Pending"
-}
+        : "Pending";
+};
 
 // Format Number
 const formatMoney = (amount?: number) =>
     Number(amount || 0).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-    })
+    });
 
 // Premium Dollar Typography
 const Money = ({
@@ -113,13 +114,11 @@ const Money = ({
     className = "",
     symbolColor,
 }: {
-    amount: number
-    className?: string
-    symbolColor?: string
+    amount: number;
+    className?: string;
+    symbolColor?: string;
 }) => (
-    <span
-        className={`inline-flex items-baseline gap-1 ${className}`}
-    >
+    <span className={`inline-flex items-baseline gap-1 ${className}`}>
         <span
             className={`text-[0.65em] font-medium ${
                 symbolColor || "text-[#9CA3AF]"
@@ -127,52 +126,82 @@ const Money = ({
         >
             $
         </span>
+
         <span>{formatMoney(amount)}</span>
     </span>
-)
+);
 
 // Format Booking Date
 const formatDate = (date?: string) => {
-    if (!date) return "Date unavailable"
+    if (!date) return "Date unavailable";
 
-    const parsed = new Date(`${date}T00:00:00`)
+    const [year, month, day] = date.split("-").map(Number);
 
-    if (Number.isNaN(parsed.getTime())) return date
+    if (
+        !year ||
+        !month ||
+        !day ||
+        month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31
+    ) {
+        return date;
+    }
 
-    return parsed.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    })
-}
+    const months = [
+        "Jan", "Feb", "Mar", "Apr",
+        "May", "Jun", "Jul", "Aug",
+        "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    return `${String(day).padStart(2, "0")} ${months[month - 1]} ${year}`;
+};
 
 // Format Booking Time
+// Uses no current Date() value during rendering.
 const formatTime = (time?: string) => {
-    if (!time) return "Time unavailable"
+    if (!time) return "Time unavailable";
 
-    const [hours, minutes] = time.split(":")
-    const parsed = new Date()
+    const [hourString, minuteString] = time.split(":");
 
-    parsed.setHours(Number(hours), Number(minutes), 0, 0)
+    const hours = Number(hourString);
+    const minutes = Number(minuteString);
 
-    return parsed.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-    })
-}
+    if (
+        !Number.isInteger(hours) ||
+        !Number.isInteger(minutes) ||
+        hours < 0 ||
+        hours > 23 ||
+        minutes < 0 ||
+        minutes > 59
+    ) {
+        return time;
+    }
+
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHour = hours % 12 || 12;
+
+    return `${String(formattedHour).padStart(2, "0")}:${String(
+        minutes
+    ).padStart(2, "0")} ${period}`;
+};
 
 const Dashboard = () => {
-    const { data: session, isPending } = authClient.useSession()
+    const { data: session, isPending } = authClient.useSession();
 
-    const user = session?.user
+    const user = session?.user;
 
-    const [bookings, setBookings] = useState<Booking[]>([])
-    const [loading, setLoading] = useState(true)
-    const [updatingId, setUpdatingId] = useState<string | null>(null)
-    const [activeFilter, setActiveFilter] = useState<Filter>("All")
-    const [error, setError] = useState("")
-    const [success, setSuccess] = useState("")
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [activeFilter, setActiveFilter] = useState<Filter>("All");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const hasUserEmail = Boolean(user?.email);
+    const displayBookings = hasUserEmail ? bookings : [];
+    const userEmail = user?.email;
 
     // =====================================
     // FETCH OWNER BOOKINGS
@@ -180,94 +209,115 @@ const Dashboard = () => {
 
     const fetchBookings = useCallback(
         async (signal?: AbortSignal) => {
-            if (!user?.email) return
+            if (!userEmail) {
+                setBookings([]);
+                setLoading(false);
+                return;
+            }
 
             try {
-                setLoading(true)
-                setError("")
+                setLoading(true);
+                setError("");
+
+                // Get Better Auth Token
+                const token = await getTokenFormClient();
+
+                if (!token) {
+                    throw new Error(
+                        "Authentication token not found. Please login again."
+                    );
+                }
 
                 const res = await fetch(
-                    `http://localhost:5000/bookingowner/${encodeURIComponent(user.email)}`,
+                    `http://localhost:5000/bookingowner/${encodeURIComponent(
+                        userEmail
+                    )}`,
                     {
                         cache: "no-store",
                         signal,
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
                     }
-                )
+                );
 
-                const responseText = await res.text()
+                const responseText = await res.text();
 
-                let data: unknown
+                let data: unknown;
 
                 try {
-                    data = JSON.parse(responseText)
+                    data = JSON.parse(responseText);
                 } catch {
                     throw new Error(
                         "Invalid response from backend. Check your API."
-                    )
+                    );
                 }
 
                 if (!res.ok) {
                     throw new Error(
                         typeof data === "object" &&
-                        data !== null &&
-                        "message" in data
+                            data !== null &&
+                            "message" in data
                             ? String(data.message)
                             : "Failed to fetch bookings."
-                    )
+                    );
                 }
 
                 if (!Array.isArray(data)) {
-                    throw new Error("Invalid booking data.")
+                    throw new Error("Invalid booking data.");
                 }
 
                 const formattedData: Booking[] = data.map(
-                    (item: Partial<Booking>) => ({
-                        ...item,
-                        status: normalizeStatus(item.status),
-                    } as Booking)
-                )
+                    (item: Partial<Booking>) =>
+                        ({
+                            ...item,
+                            status: normalizeStatus(item.status),
+                        }) as Booking
+                );
 
-                setBookings(formattedData)
+                setBookings(formattedData);
             } catch (err) {
                 if (
                     err instanceof Error &&
                     err.name === "AbortError"
                 ) {
-                    return
+                    return;
                 }
 
-                console.error("Fetch Error:", err)
+                console.error("Fetch Error:", err);
 
                 setError(
                     err instanceof Error
                         ? err.message
                         : "Unable to load bookings."
-                )
+                );
             } finally {
                 if (!signal?.aborted) {
-                    setLoading(false)
+                    setLoading(false);
                 }
             }
         },
-        [user?.email]
-    )
+        [userEmail]
+    );
 
     // Initial Fetch
     useEffect(() => {
-        if (isPending) return
+        if (isPending) return;
 
         if (!user?.email) {
-            setBookings([])
-            setLoading(false)
-            return
+            setBookings([]);
+            setLoading(false);
+            return;
         }
 
-        const controller = new AbortController()
+        const controller = new AbortController();
 
-        fetchBookings(controller.signal)
+        void fetchBookings(controller.signal);
 
-        return () => controller.abort()
-    }, [isPending, user?.email, fetchBookings])
+        return () => {
+            controller.abort();
+        };
+    }, [isPending, user?.email, fetchBookings]);
 
     // =====================================
     // UPDATE BOOKING STATUS
@@ -277,41 +327,55 @@ const Dashboard = () => {
         bookingId: string,
         status: BookingStatus
     ) => {
-        if (!user?.email || updatingId !== null) return
+        if (!user?.email || updatingId !== null) return;
 
         try {
-            setUpdatingId(bookingId)
-            setError("")
-            setSuccess("")
+            setUpdatingId(bookingId);
+            setError("");
+            setSuccess("");
+
+            // Get Better Auth Token
+            const token = await getTokenFormClient();
+
+            if (!token) {
+                throw new Error(
+                    "Authentication token not found. Please login again."
+                );
+            }
 
             const res = await fetch(
-                `http://localhost:5000/UpdateBooking/${encodeURIComponent(user.email)}`,
+                `http://localhost:5000/UpdateBooking/${encodeURIComponent(
+                    user.email
+                )}`,
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                         bookingId,
                         status,
                     }),
                 }
-            )
+            );
 
-            const responseText = await res.text()
+            const responseText = await res.text();
 
-            let data: { message?: string }
+            let data: { message?: string };
 
             try {
-                data = JSON.parse(responseText)
+                data = JSON.parse(responseText);
             } catch {
-                throw new Error("Invalid response from backend.")
+                throw new Error(
+                    "Invalid response from backend."
+                );
             }
 
             if (!res.ok) {
                 throw new Error(
                     data.message || "Failed to update booking."
-                )
+                );
             }
 
             // Update UI Instantly
@@ -325,23 +389,23 @@ const Dashboard = () => {
                           }
                         : booking
                 )
-            )
+            );
 
             setSuccess(
                 `Booking successfully updated to ${status}.`
-            )
+            );
         } catch (err) {
-            console.error("Update Error:", err)
+            console.error("Update Error:", err);
 
             setError(
                 err instanceof Error
                     ? err.message
                     : "Something went wrong."
-            )
+            );
         } finally {
-            setUpdatingId(null)
+            setUpdatingId(null);
         }
-    }
+    };
 
     // =====================================
     // DASHBOARD STATISTICS
@@ -349,23 +413,23 @@ const Dashboard = () => {
 
     const statistics = useMemo(() => {
         const count = (status: BookingStatus) =>
-            bookings.filter(
+            displayBookings.filter(
                 (booking) => booking.status === status
-            ).length
+            ).length;
 
-        const completedBookings = bookings.filter(
+        const completedBookings = displayBookings.filter(
             (booking) => booking.status === "Completed"
-        )
+        );
 
         // Earnings: Completed studio fees only
         const earnings = completedBookings.reduce(
             (total, booking) =>
                 total + Number(booking.subtotal || 0),
             0
-        )
+        );
 
         // Total booking value excluding cancelled bookings
-        const totalAmount = bookings
+        const totalAmount = displayBookings
             .filter(
                 (booking) => booking.status !== "Cancelled"
             )
@@ -373,10 +437,10 @@ const Dashboard = () => {
                 (total, booking) =>
                     total + Number(booking.totalAmount || 0),
                 0
-            )
+            );
 
         return {
-            total: bookings.length,
+            total: displayBookings.length,
             pending: count("Pending"),
             confirmed: count("Confirmed"),
             completed: count("Completed"),
@@ -387,20 +451,20 @@ const Dashboard = () => {
                 completedBookings.length > 0
                     ? earnings / completedBookings.length
                     : 0,
-        }
-    }, [bookings])
+        };
+    }, [displayBookings]);
 
     // =====================================
     // FILTER BOOKINGS
     // =====================================
 
     const filteredBookings = useMemo(() => {
-        if (activeFilter === "All") return bookings
+        if (activeFilter === "All") return displayBookings;
 
-        return bookings.filter(
+        return displayBookings.filter(
             (booking) => booking.status === activeFilter
-        )
-    }, [bookings, activeFilter])
+        );
+    }, [displayBookings, activeFilter]);
 
     // =====================================
     // SESSION LOADING
@@ -417,7 +481,7 @@ const Dashboard = () => {
                     </p>
                 </div>
             </main>
-        )
+        );
     }
 
     // =====================================
@@ -441,7 +505,7 @@ const Dashboard = () => {
                     </p>
                 </div>
             </main>
-        )
+        );
     }
 
     // =====================================
@@ -485,15 +549,13 @@ const Dashboard = () => {
             background: "bg-red-50",
             border: "border-red-100",
         },
-    ]
+    ];
 
     return (
         <main className="min-h-screen bg-[#F4F5F6] font-sans">
             <div className="mx-auto max-w-[1320px] px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
 
-                {/* =====================================
-                    DASHBOARD HEADER
-                ===================================== */}
+                {/* DASHBOARD HEADER */}
 
                 <section className="mb-9 flex flex-col justify-between gap-6 md:flex-row md:items-center">
                     <div>
@@ -549,9 +611,7 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                {/* =====================================
-                    BOOKING STATISTICS
-                ===================================== */}
+                {/* BOOKING STATISTICS */}
 
                 <section className="mb-7">
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -572,7 +632,6 @@ const Dashboard = () => {
 
                     <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 xl:grid-cols-5">
 
-                        {/* Status Cards */}
                         {stats.map((stat, index) => (
                             <div
                                 key={stat.name}
@@ -639,9 +698,7 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                {/* =====================================
-                    TOTAL EARNINGS
-                ===================================== */}
+                {/* TOTAL EARNINGS */}
 
                 <section className="mb-9 overflow-hidden rounded-3xl bg-[#1E1E1E] shadow-[0_12px_35px_rgba(30,30,30,0.08)]">
                     <div className="relative grid gap-7 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:px-10 lg:py-9">
@@ -720,9 +777,7 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                {/* =====================================
-                    CUSTOMER BOOKINGS
-                ===================================== */}
+                {/* CUSTOMER BOOKINGS */}
 
                 <section className="overflow-hidden rounded-3xl border border-[#E5E7EB] bg-white shadow-[0_5px_25px_rgba(30,30,30,0.025)]">
 
@@ -746,7 +801,7 @@ const Dashboard = () => {
 
                         <button
                             type="button"
-                            onClick={() => fetchBookings()}
+                            onClick={() => void fetchBookings()}
                             disabled={loading}
                             className="flex items-center justify-center gap-2 self-start rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm font-semibold text-[#1E1E1E] transition hover:border-[#9CF237] hover:bg-[#F9FFF2] disabled:opacity-50 md:self-auto"
                         >
@@ -771,7 +826,7 @@ const Dashboard = () => {
                                                   | "confirmed"
                                                   | "completed"
                                                   | "cancelled"
-                                          ]
+                                          ];
 
                                 return (
                                     <button
@@ -792,7 +847,7 @@ const Dashboard = () => {
                                             {count}
                                         </span>
                                     </button>
-                                )
+                                );
                             })}
                         </div>
                     </div>
@@ -806,7 +861,7 @@ const Dashboard = () => {
 
                             <button
                                 type="button"
-                                onClick={() => fetchBookings()}
+                                onClick={() => void fetchBookings()}
                                 className="text-sm font-semibold text-red-700 underline"
                             >
                                 Try again
@@ -863,8 +918,7 @@ const Dashboard = () => {
                         /* Booking Cards */
                         <div className="divide-y divide-[#F0F1F2]">
                             {filteredBookings.map((booking) => {
-                                const status =
-                                    statusConfig[booking.status]
+                                const status = statusConfig[booking.status];
 
                                 return (
                                     <article
@@ -878,10 +932,7 @@ const Dashboard = () => {
                                                 {booking.studioImage ? (
                                                     <Image
                                                         src={booking.studioImage}
-                                                        alt={
-                                                            booking.studioTitle ||
-                                                            "Studio"
-                                                        }
+                                                        alt={booking.studioTitle || "Studio"}
                                                         fill
                                                         unoptimized
                                                         sizes="(max-width: 768px) 100vw, 230px"
@@ -1145,18 +1196,14 @@ const Dashboard = () => {
                                             </div>
                                         </div>
                                     </article>
-                                )
+                                );
                             })}
                         </div>
                     )}
                 </section>
-
-              
-
-                
             </div>
         </main>
-    )
-}
+    );
+};
 
-export default Dashboard
+export default Dashboard;

@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { redirect } from "next/navigation";
+import { getTokenFormClient } from "@/lib/getTokenFormClient";
 
 type Studio = {
   _id: string;
@@ -105,6 +106,8 @@ const Update = ({ studio }: { studio: Studio }) => {
         email: studio.owner.email,
       },
     };
+    const token = await getTokenFormClient()
+
 
 
    
@@ -112,6 +115,7 @@ const Update = ({ studio }: { studio: Studio }) => {
         method:"PATCH",
         headers: {
             "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
     })

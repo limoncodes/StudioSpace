@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getTokenFormClient } from "@/lib/getTokenFormClient";
 
 type Studio = {
   _id: string;
@@ -38,6 +39,7 @@ const MylistingDelete = ({ studio, onDeleted }: DeleteProps) => {
     e: MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
+    const token = await getTokenFormClient()
 
     try {
       setIsDeleting(true);
@@ -46,6 +48,9 @@ const MylistingDelete = ({ studio, onDeleted }: DeleteProps) => {
         `http://localhost:5000/delete-studio/${studio._id}`,
         {
           method: "DELETE",
+          headers:{
+             Authorization: `Bearer ${token}`,
+          }
         }
       );
       const data = await res.json()

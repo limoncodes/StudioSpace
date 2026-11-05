@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Bounce, toast } from "react-toastify";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { getTokenFormClient } from "@/lib/getTokenFormClient";
 
 const categories = [
     "Photo Studio",
@@ -40,9 +41,11 @@ const amenitiesList = [
 ];
 
 const AddStudio = () => {
+    const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
     const [formMessage, setFormMessage] = useState<{
         type: "success" | "error";
@@ -65,152 +68,191 @@ const AddStudio = () => {
 
 
     // Form Submit
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  
+const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-        setFormMessage(null);
+    setFormMessage(null);
 
-        // Authentication Check
-        if (!user) {
-            setFormMessage({
-                type: "error",
-                text: "Please login before adding a new studio.",
-            });
-            return;
+    // Authentication Check
+    if (!user) {
+        setFormMessage({
+            type: "error",
+            text: "Please login before adding a new studio.",
+        });
+        return;
+    }
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Form Values
+    const title = String(formData.get("title") || "").trim();
+    const category = String(formData.get("category") || "");
+    const hourlyRateValue = String(formData.get("hourlyRate") || "");
+    const securityDepositValue = String(
+        formData.get("securityDeposit") || ""
+    );
+    const maxCapacityValue = String(formData.get("maxCapacity") || "");
+    const location = String(formData.get("location") || "").trim();
+    const imageURL = String(formData.get("imageURL") || "").trim();
+    const overview = String(formData.get("overview") || "").trim();
+
+    // Required Fields Validation
+    if (
+        !title ||
+        !category ||
+        !hourlyRateValue ||
+        !securityDepositValue ||
+        !maxCapacityValue ||
+        !location ||
+        !imageURL ||
+        !overview
+    ) {
+        setFormMessage({
+            type: "error",
+            text: "Please complete all required fields.",
+        });
+        return;
+    }
+
+    // Number Validation
+    const hourlyRate = Number(hourlyRateValue);
+    const securityDeposit = Number(securityDepositValue);
+    const maxCapacity = Number(maxCapacityValue);
+
+    if (!Number.isFinite(hourlyRate) || hourlyRate <= 0) {
+        setFormMessage({
+            type: "error",
+            text: "Hourly rate must be greater than zero.",
+        });
+        return;
+    }
+
+    if (!Number.isFinite(securityDeposit) || securityDeposit < 0) {
+        setFormMessage({
+            type: "error",
+            text: "Please enter a valid security deposit.",
+        });
+        return;
+    }
+
+    if (!Number.isInteger(maxCapacity) || maxCapacity < 1) {
+        setFormMessage({
+            type: "error",
+            text: "Maximum capacity must be at least 1.",
+        });
+        return;
+    }
+
+    // Image URL Validation
+    try {
+        const url = new URL(imageURL);
+
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+            throw new Error("Invalid image URL");
+        }
+    } catch {
+        setFormMessage({
+            type: "error",
+            text: "Please enter a valid studio image URL.",
+        });
+        return;
+    }
+
+    // Complete Studio Data
+    const studioData = {
+        title,
+        category,
+        hourlyRate,
+        securityDeposit,
+        maxCapacity,
+        location,
+        imageURL,
+        amenities: selectedAmenities,
+        overview,
+
+        owner: {
+            name: user.name,
+            email: user.email,
+        },
+    };
+
+    try {
+        setIsSubmitting(true);
+
+        // Get Better Auth Token
+        const token = await getTokenFormClient();
+
+        if (!token) {
+            throw new Error("Authentication token not found. Please login again.");
         }
 
-        const form = e.currentTarget;
-        const formData = new FormData(form);
-
-        // Form Values
-        const title = String(formData.get("title") || "").trim();
-        const category = String(formData.get("category") || "");
-        const hourlyRateValue = String(formData.get("hourlyRate") || "");
-        const securityDepositValue = String(
-            formData.get("securityDeposit") || ""
-        );
-        const maxCapacityValue = String(formData.get("maxCapacity") || "");
-        const location = String(formData.get("location") || "").trim();
-        const imageURL = String(formData.get("imageURL") || "").trim();
-        const overview = String(formData.get("overview") || "").trim();
-
-        // Required Fields Validation
-        if (
-            !title ||
-            !category ||
-            !hourlyRateValue ||
-            !securityDepositValue ||
-            !maxCapacityValue ||
-            !location ||
-            !imageURL ||
-            !overview
-        ) {
-            setFormMessage({
-                type: "error",
-                text: "Please complete all required fields.",
-            });
-            return;
-        }
-
-        // Number Validation
-        const hourlyRate = Number(hourlyRateValue);
-        const securityDeposit = Number(securityDepositValue);
-        const maxCapacity = Number(maxCapacityValue);
-
-        if (!Number.isFinite(hourlyRate) || hourlyRate <= 0) {
-            setFormMessage({
-                type: "error",
-                text: "Hourly rate must be greater than zero.",
-            });
-            return;
-        }
-
-        if (!Number.isFinite(securityDeposit) || securityDeposit < 0) {
-            setFormMessage({
-                type: "error",
-                text: "Please enter a valid security deposit.",
-            });
-            return;
-        }
-
-        if (
-            !Number.isInteger(maxCapacity) ||
-            maxCapacity < 1
-        ) {
-            setFormMessage({
-                type: "error",
-                text: "Maximum capacity must be at least 1.",
-            });
-            return;
-        }
-
-        // Image URL Validation
-        try {
-            const url = new URL(imageURL);
-
-            if (url.protocol !== "http:" && url.protocol !== "https:") {
-                throw new Error("Invalid image URL");
-            }
-        } catch {
-            setFormMessage({
-                type: "error",
-                text: "Please enter a valid studio image URL.",
-            });
-            return;
-        }
-
-        // Complete Studio Data
-        const studioData = {
-            title,
-            category,
-            hourlyRate,
-            securityDeposit,
-            maxCapacity,
-            location,
-            imageURL,
-            amenities: selectedAmenities,
-            overview,
-
-            owner: {
-                name: user.name,
-                email: user.email,
-            },
-        };
-
-        
-
-        // ==========================================
+        // Send Studio Data
         const res = await fetch("http://localhost:5000/add-studio", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(studioData),
-        })
-        const data = await res.json();
-        console.log("Server Response:", data);
+        });
 
-        // alart
-        toast.success('Studio form submitted successfully!', {
+        const data = await res.json().catch(() => null);
+
+        // Check API Response
+        if (!res.ok) {
+            throw new Error(
+                data?.message || `Failed to add studio. Status: ${res.status}`
+            );
+        }
+
+        console.log("Studio Added Successfully:", data);
+
+        // Success Toast
+        toast.success("Studio added successfully!", {
             position: "top-center",
-            autoClose: 5000,
+            autoClose: 3000,
             hideProgressBar: false,
             closeOnClick: false,
             pauseOnHover: true,
             draggable: true,
-            progress: undefined,
             theme: "light",
             transition: Bounce,
         });
 
-
         setFormMessage({
             type: "success",
-            text: "Studio form submitted successfully! ",
+            text: "Studio added successfully!",
         });
-        redirect("/my-listing")
-    };
+
+        // Navigate After Successful Submission
+        router.push("/my-listing");
+
+    } catch (error) {
+        console.error("Add Studio Error:", error);
+
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : "Something went wrong. Please try again.";
+
+        setFormMessage({
+            type: "error",
+            text: errorMessage,
+        });
+
+        toast.error(errorMessage, {
+            position: "top-center",
+            autoClose: 4000,
+            theme: "light",
+            transition: Bounce,
+        });
+
+    } finally {
+        setIsSubmitting(false);
+    }
+};
 
     return (
         <section className="min-h-screen bg-[#F4F5F6] px-4 py-10 font-body sm:px-6 lg:py-16">
@@ -611,14 +653,16 @@ const AddStudio = () => {
                             <div className="border-t border-[#E5E7EB] pt-7">
                                 <Button
                                     type="submit"
-                                    disabled={isPending || !user}
+                                    disabled={isPending || !user || isSubmitting}
                                     className="h-13 w-full rounded-xl bg-[#9CF237] text-sm font-bold text-[#1E1E1E] shadow-none transition-colors hover:bg-[#8DE62B] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-52"
                                 >
                                     {isPending
                                         ? "Checking Account..."
-                                        : !user
-                                            ? "Login Required"
-                                            : "Submit Studio Details"}
+                                        : isSubmitting
+                                            ? "Submitting..."
+                                            : !user
+                                                ? "Login Required"
+                                                : "Submit Studio Details"}
 
                                     <span className="ml-2 text-lg">→</span>
                                 </Button>

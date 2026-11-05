@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
+import { jwt } from "better-auth/plugins";
 
 const client = new MongoClient(`mongodb+srv://${process.env.MONGODB_USESRNAME}:${process.env.MONGODB_PASSWOED}@cluster0.4dwew1j.mongodb.net/`);
 const db = client.db("studio-space");
@@ -23,4 +24,16 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
   },
+  plugins:[
+    jwt(),
+  ],
+  session:{
+    cookieCache:{
+      enabled: true,
+      strategy:'jwt',
+
+      maxAge:7*24*60*60
+      
+    }
+  }
 });

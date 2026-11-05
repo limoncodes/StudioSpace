@@ -8,6 +8,7 @@ import Link from "next/link";
 import { FiMapPin, FiUsers, FiEdit2, FiTrash2 } from "react-icons/fi";
 import Update from "@/components/mylistbutton/Update";
 import MylistingDelete from "@/components/mylistbutton/MylistingDelete";
+import { getTokenFormClient } from "@/lib/getTokenFormClient";
 
 
 type Studio = {
@@ -37,14 +38,21 @@ const MyListing = () => {
 
   useEffect(() => {
     if (!user?.email) return;
+    
 
     const fetchListings = async () => {
+      const token = await getTokenFormClient()
+      
       try {
         setLoading(true);
 
         const res = await fetch(
           `http://localhost:5000/my-listings/${encodeURIComponent(user.email)}`
-        );
+        ,{
+          headers:{
+             Authorization: `Bearer ${token}`,
+          }
+        });
 
         if (!res.ok) {
           throw new Error("Failed to fetch listings");
@@ -190,7 +198,14 @@ const MyListing = () => {
                   <div className="grid grid-cols-2 gap-3 border-t border-[#E5E7EB] pt-4">
 
                     <Update studio={studio}/>
-                    <MylistingDelete studio={studio} />
+                    <MylistingDelete
+                      studio={studio}
+                      onDeleted={() =>
+                        setListings((current) =>
+                          current.filter((listing) => listing._id !== studio._id)
+                        )
+                      }
+                    />
                    
 
                   </div>
